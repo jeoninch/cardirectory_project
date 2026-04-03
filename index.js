@@ -2338,31 +2338,50 @@ btn_1.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    renderBanners(Brand_Data);
+    fetch('./data/brands.json')
+    .then(res => res.json())
+    .then(brands => {
+        renderBanners(brands);
+    });
 });
 
 btn_2.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    renderBanners(Wholesale_Data);
+    fetch('./data/wholesale.json')
+    .then(res => res.json())
+    .then(markets => {
+        renderBanners(markets);
+    });
 });
 
-btn_3.addEventListener('click', function () {
+btn_3.addEventListener('click', async function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
     linksDiv.appendChild(ebox);
-    renderCards(Event_Data);
+
+    const eventRes = await fetch('./data/events.json');
+    const event = await eventRes.json();
+    renderCards(event);
+
     linksDiv.appendChild(cbox);
-    renderCards(community_Data);
+
+    const communityRes = await fetch('./data/community.json');
+    const community = await communityRes.json();
+    renderCards(community);
 });
 
 btn_4.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    renderCards(Blog_Data);
+    fetch('./data/blogs.json')
+    .then(res => res.json())
+    .then(blog => {
+        renderCards(blog);
+    });
 });
 
 btn_5.addEventListener('click', function () {

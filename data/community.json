@@ -1,0 +1,15 @@
+[
+  { "href": "https://www.reddit.com/r/cardistry/", "name": "Reddit (r/Cardistry)", "imgSrc": "icons/Reddit_logo.png" },
+  { "href": "https://discord.gg/GvKptMvCg4/", "name": "Missing", "type": "discord" },
+  { "href": "https://discord.gg/RqkXTGwvm6", "name": "Cardiscord", "type": "discord" },
+  { "href": "https://discord.com/invite/vFJ4HzweY8", "name": "Cardistry(itscardistry)", "type": "discord" },
+  { "href": "https://www.instagram.com/cardistry.gang/", "name": "Cardistry gang", "type": "insta" },
+  { "href": "https://www.instagram.com/the54club/", "name": "The54club 🇯🇵", "type": "insta" },
+  { "href": "https://www.instagram.com/cardistrycn/", "name": "CardistryCN 🇨🇳", "type": "insta" },
+  { "href": "https://www.instagram.com/zapza_cardistry/", "name": "Zapza(잡자) 🇰🇷", "type": "insta" },
+  { "href": "https://www.instagram.com/cardipelago/", "name": "Cardipelago 🇵🇭", "type": "insta" },
+  { "href": "https://www.instagram.com/cardistrykr/", "name": "Cardistrykr 🇰🇷", "type": "insta" },
+  { "href": "https://www.instagram.com/singapore_cardistry/", "name": "Singapore cardistry 🇸🇬", "type": "insta" },
+  { "href": "https://www.instagram.com/seattlecardistry/", "name": "Seattle cardistry 🇺🇸", "type": "insta" },
+  { "href": "https://www.instagram.com/bostoncardistry/", "name": "Boston cardistry 🇺🇸", "type": "insta" }
+]
