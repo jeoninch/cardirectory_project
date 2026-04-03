@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Directory for Cardistry & Playing cards">
+    <meta name="google-adsense-account" content="ca-pub-6534029124480290">
+    <title>Cardirectory</title>
+    <link rel="icon" href="/main.ico">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body style="background: rgb(0, 12, 146);">
+    <!-- Update Note 버튼을 nav 밖 오른쪽 상단에 배치 -->
+    <button id="update-btn" class="update-button" type="button"><img src="wheel.gif"></button>
+    <img src="header.webp" id="header" class="header" style="cursor:pointer;"><br>
+    <nav id="custom-nav" class="custom-nav" style="display: none; margin: 0; margin-bottom: 5px;">
+        <div id="nav-row" class="nav-row">
+            <p id="btn_1" class="nav-btn" type="brands">/Brand</p>
+            <p id="btn_2" class="nav-btn" type="markets">/Market</p>
+            <!-- <button class="btn_5" type="community"><p>/Community</p></button> -->
+            <!-- 이벤트 -->
+            <p id="btn_3" class="nav-btn">/Event&Community</p>
+            <!-- 블로그 -->
+            <p id="btn_4" class="nav-btn">/Blog</p>
+            <!-- 프로필 -->
+            <p id="btn_5" class="nav-btn" type="profile">/Profile</p>
+            <!-- nav end point -->
+            <div id="nav-bin" style = 'display: none;'>
+                <a href="https://www.youtube.com/watch?v=QeZehgqWPgI&ab_channel=135" style="font-family: 'Times New Roman', Times, serif; font-size:270%; color: white; text-decoration-line: none;">/bin</a>
+            </div>
+        </div>
+    </nav>
+    <div id="links" class="link-box"></div>
+    
+    <a class="flag_counter" href="https://info.flagcounter.com/h6ld" style="position: fixed; bottom: 0;right: 5px;opacity: 80%;"><img src="https://s05.flagcounter.com/count/h6ld/bg_FFFFFF/txt_000000/border_CCC8C8/columns_2/maxflags_6/viewers_3/labels_0/pageviews_1/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
+
+    <div id="update-modal" class="update-modal" style="display: none;">
+        <div id="update-content" class="update-content">
+            <button id="close-btn" class="close-btn">X</button>
+            <h3>Update notes - 2026.03.31+ ver (+update)</h3>
+            <ul>
+                <h3>English</h3>
+                <li>Added 6 brands</li>
+                <li>Added profile tab</li>
+                <li>Changed Event tab to Event&community tab</li>
+                <li>Modified some UI</li>
+                <li>+Added "Create Profile" button!</li>
+                <h3>Korean</h3>
+                <li>브랜드 6개를 추가했습니다.</li>
+                <li>프로필 탭을 추가했습니다.</li>
+                <li>이벤트 탭을 이벤트&커뮤니티 탭으로 바꿨습니다</li>
+                <li>UI를 전체적으로 손봤습니다.</li>
+                <li>+프로필 생성 버튼을 추가했습니다!</li>
+            </ul>
+        </div>
+    </div>
+</body>
+<footer>
+    <p>2026.03.31+v</p>
+    <a target="_blank" href="about.html">About cardirectory</a>
+    <!-- <img src="https://hitscounter.dev/api/hit?url=https%3A%2F%2Fcardirectory.online&label=Visitors&icon=cursor&color=%23198754&message=&style=flat&tz=UTC"> -->
+</footer><br>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="index.js"></script>
+</html>
