@@ -2,7 +2,7 @@ name: Brand Checker
 
 on:
   schedule:
-    - cron: '0 9 * * 1'  # 매주 월요일 오전 9시
+    - cron: '0 9 * * 1'  # 매주 월요일 오전 9시 (UTC 기준)
   workflow_dispatch:      # 수동 실행도 가능
 
 jobs:
@@ -10,35 +10,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Python 설치
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: 패키지 설치
         run: pip install anthropic discord.py requests
-      
+
       - name: 브랜드 탐색 실행
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          MY_GITHUB_REPO: ${{ secrets.MY_GITHUB_REPO }}
         run: python scripts/brand_checker.py
 
   approve-brands:
     runs-on: ubuntu-latest
-    # 텔레그램에서 /approve 명령 받으면 이 workflow 실행
     if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v3
-      - run: python scripts/approve_brands.py
-      
-      - name: GitHub Push (자동 배포 트리거)
+
+      - name: Python 설치
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 브랜드 승인 실행
+        run: python scripts/approve_brands.py
+
+      - name: GitHub Push (Cloudflare Pages 자동 배포 트리거)
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add brands.json
-          git commit -m "✅ 새 브랜드 자동 추가"
+          git add brands.json pending_brands.json
+          git diff --staged --quiet || git commit -m "✅ 새 브랜드 자동 추가"
           git push
-        # → Cloudflare Pages가 감지해서 자동 배포!
+        env:
+          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
