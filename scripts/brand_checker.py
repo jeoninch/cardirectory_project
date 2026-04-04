@@ -12,7 +12,7 @@ DISCORD_CHANNEL_ID = int(os.environ["DISCORD_CHANNEL_ID"])
 def load_existing_brands():
     with open("brands.json", "r", encoding="utf-8") as f:
         brands = json.load(f)
-    return [b["name"].lower() for b in brands]
+    return [b["href"].lower() for b in brands]
 
 # Claude로 새 브랜드 탐색
 def search_new_brands(existing_brands):
@@ -28,11 +28,11 @@ def search_new_brands(existing_brands):
             "content": f"""
             카디스트리 및 플레잉 카드 관련 브랜드를 웹에서 검색해줘.
             아래 목록에 없는 새로운 브랜드만 찾아줘:
-            기존 브랜드: {existing_list}
+            기존 브랜드 URL 목록: {existing_list}
 
             결과는 JSON 형태로만 답해줘:
             [
-              {{"name": "브랜드명", "url": "공식URL", "description": "간단한 설명"}}
+              {{"name": "브랜드명", "href": "공식URL", "imgSrc": "banners/파일명.webp"}}
             ]
             없으면 빈 배열 [] 반환.
             """
@@ -63,15 +63,14 @@ async def send_discord(new_brands):
             return
 
         # pending 저장
-        with open("pending_brands.json", "w") as f:
+        with open("pending_brands.json", "w", encoding="utf-8") as f:
             json.dump(new_brands, f, ensure_ascii=False)
 
         # 메시지 구성
         message = "🆕 **새로운 카디스트리 브랜드 발견!**\n\n"
         for b in new_brands:
             message += f"• **{b['name']}**\n"
-            message += f"  {b['url']}\n"
-            message += f"  {b['description']}\n\n"
+            message += f"  {b['href']}\n\n"
         message += "추가하려면 `/approve`, 취소하려면 `/reject` 입력"
 
         await channel.send(message)
@@ -79,13 +78,12 @@ async def send_discord(new_brands):
 
     @bot.command()
     async def approve(ctx):
-        # GitHub Actions workflow 트리거
         import requests
         headers = {
-            "Authorization": f"token {os.environ['GITHUB_TOKEN']}",
+            "Authorization": f"token {os.environ['MY_GITHUB_TOKEN']}",
             "Accept": "application/vnd.github.v3+json"
         }
-        repo = os.environ["GITHUB_REPO"]  # "유저명/레포명"
+        repo = os.environ["MY_GITHUB_REPO"]  # 예: "유저명/cardirectory"
         requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/approve-brands.yml/dispatches",
             headers=headers,
