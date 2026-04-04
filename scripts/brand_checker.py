@@ -10,7 +10,7 @@ DISCORD_CHANNEL_ID = int(os.environ["DISCORD_CHANNEL_ID"])
 
 # 기존 브랜드 목록 불러오기
 def load_existing_brands():
-    with open("brands.json", "r", encoding="utf-8") as f:
+    with open("./data/brands.json", "r", encoding="utf-8") as f:
         brands = json.load(f)
     return [b["href"].lower() for b in brands]
 
@@ -63,7 +63,7 @@ async def send_discord(new_brands):
             return
 
         # pending 저장
-        with open("pending_brands.json", "w", encoding="utf-8") as f:
+        with open("./data/pending_brands.json", "w", encoding="utf-8") as f:
             json.dump(new_brands, f, ensure_ascii=False)
 
         # 메시지 구성
@@ -93,7 +93,7 @@ async def send_discord(new_brands):
 
     @bot.command()
     async def reject(ctx):
-        with open("pending_brands.json", "w") as f:
+        with open("./data/pending_brands.json", "w") as f:
             json.dump([], f)
         await ctx.send("❌ 거절되었습니다.")
 
