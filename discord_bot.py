@@ -104,37 +104,74 @@ def upload_banner_to_github(image_bytes, filename):
     res = requests.put(url, headers=github_headers(), json=payload)
     return res.status_code in [200, 201]
 
-def get_all_existing_domains():
+SOCIAL_DOMAINS = {"instagram.com", "youtube.com", "discord.gg", "discord.com", "twitter.com", "x.com"}
+
+def extract_identifier(href):
     """
-    비용 절감: URL 전체 대신 도메인만 추출해서 전송
-    예) https://www.fontainecards.com → fontainecards.com
+    URL에서 고유 식별자 추출
+    - 일반 사이트: 도메인만  → fontainecards.com
+    - 소셜미디어: 계정명 포함 → instagram.com/cardistryworld.official
     """
-    all_domains = set()
+    href = href.lower().rstrip("/")
+    cleaned = re.sub(r'https?://(www\.)?'  , '', href)
+    parts = cleaned.split("/")
+    domain = parts[0]
+    if domain in SOCIAL_DOMAINS and len(parts) > 1 and parts[1]:
+        return f"{domain}/{parts[1]}"
+    return domain
+
+def get_all_existing_data():
+    """
+    모든 카테고리 JSON에서 기존 데이터 수집
+    반환: {
+        "identifiers": set(),  # 중복 체크용 (Python에서 사용)
+        "hint_domains": list() # Claude 힌트용 샘플 (토큰 절약)
+        "event_names": set()   # events name 중복 체크용
+    }
+    """
+    identifiers = set()
+    event_names = set()
+
     for cat, info in CATEGORIES.items():
         try:
             data, _ = get_json_from_github(info["file"])
             for item in data:
-                href = item["href"].lower()
-                # 도메인만 추출
-                domain = re.sub(r'https?://(www\.)?', '', href).split("/")[0]
-                all_domains.add(domain)
+                identifiers.add(extract_identifier(item["href"]))
+                # events는 name도 수집
+                if cat == "events" and "name" in item:
+                    event_names.add(normalize_name(item["name"]))
         except:
             pass
-    return all_domains
+
+    # Claude에 보낼 힌트: 전체 중 30개만 샘플링 (토큰 절약)
+    # 실제 중복 체크는 Python에서 전체 identifiers로 처리
+    hint_domains = list(identifiers)[:30]
+
+    return {
+        "identifiers": identifiers,
+        "hint_domains": hint_domains,
+        "event_names": event_names
+    }
+
+def normalize_name(name):
+    """name 정규화 - 대소문자/공백/특수문자 제거 후 비교"""
+    return re.sub(r'[^a-z0-9]', '', name.lower())
 
 # ========================
 # Claude 탐색 (비용 최적화 - 단일 호출)
 # ========================
 
-def search_all_categories(existing_domains):
+def search_all_categories(existing_data):
     """
     💰 비용 절감 포인트:
-    - 카테고리 5개를 API 1번 호출로 한꺼번에 탐색
-    - claude-haiku 사용 (가장 저렴)
-    - 도메인만 전달 (URL 전체 X)
+    - API 1번 호출로 전체 카테고리 탐색
+    - Claude에는 30개 힌트만 전달 (토큰 절약)
+    - 실제 중복 체크는 Python에서 전체 목록으로 처리
     """
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    domain_list = ", ".join(sorted(existing_domains)[:80]) if existing_domains else "none"
+
+    # Claude한테는 힌트용 샘플만 전달 (비용 절약)
+    hint_list = ", ".join(existing_data["hint_domains"]) if existing_data["hint_domains"] else "none"
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -143,8 +180,9 @@ def search_all_categories(existing_domains):
         messages=[{
             "role": "user",
             "content": (
-                "Search for NEW cardistry-related websites NOT in this domain list:\n"
-                f"{domain_list}\n\n"
+                "Search for NEW cardistry-related websites. "
+                "Here are some examples of sites that already exist (not exhaustive):\n"
+                f"{hint_list}\n\n"
                 "Find up to 2 new items per category and reply ONLY with this JSON format:\n"
                 "{\n"
                 '  "brands": [{"href": "URL"}],\n'
@@ -164,16 +202,25 @@ def search_all_categories(existing_domains):
         end = text.rfind("}") + 1
         results = json.loads(text[start:end])
 
-        # 중복 도메인 필터링
+        # 실제 중복 체크는 Python에서 전체 identifiers로 처리
+        identifiers = existing_data["identifiers"]
+        event_names = existing_data["event_names"]
+
         filtered = {}
         for category, items in results.items():
             if category not in CATEGORIES:
                 continue
             clean = []
             for item in items:
-                domain = re.sub(r'https?://(www\.)?', '', item["href"].lower()).split("/")[0]
-                if domain not in existing_domains:
-                    clean.append(item)
+                # href 중복 체크
+                identifier = extract_identifier(item["href"])
+                if identifier in identifiers:
+                    continue
+                # events는 name도 중복 체크
+                if category == "events" and "name" in item:
+                    if normalize_name(item["name"]) in event_names:
+                        continue
+                clean.append(item)
             filtered[category] = clean
         return filtered
     except:
@@ -188,7 +235,7 @@ async def run_brand_check(channel):
 
     try:
         # 모든 기존 도메인 수집
-        all_existing = get_all_existing_domains()
+        all_existing = get_all_existing_data()
 
         # 💰 API 1번만 호출해서 전체 카테고리 탐색
         results = search_all_categories(all_existing)
