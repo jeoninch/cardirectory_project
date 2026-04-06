@@ -2338,22 +2338,14 @@ btn_1.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    fetch('./data/brands.json')
-    .then(res => res.json())
-    .then(brands => {
-        renderBanners(brands);
-    });
+    renderBanners(Brand_Data);
 });
 
 btn_2.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    fetch('./data/wholesale.json')
-    .then(res => res.json())
-    .then(markets => {
-        renderBanners(markets);
-    });
+    renderBanners(Wholesale_Data);
 });
 
 btn_3.addEventListener('click', async function () {
@@ -2361,27 +2353,16 @@ btn_3.addEventListener('click', async function () {
     clearProfileHubHash();
     linksDiv.innerHTML = '';
     linksDiv.appendChild(ebox);
-
-    const eventRes = await fetch('./data/events.json');
-    const event = await eventRes.json();
-    renderCards(event);
-
+    renderCards(Event_Data);
     linksDiv.appendChild(cbox);
-
-    const communityRes = await fetch('./data/community.json');
-    const community = await communityRes.json();
-    renderCards(community);
+    renderCards(community_Data);
 });
 
 btn_4.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
-    fetch('./data/blogs.json')
-    .then(res => res.json())
-    .then(blog => {
-        renderCards(blog);
-    });
+    renderCards(Blog_Data);
 });
 
 btn_5.addEventListener('click', function () {
