@@ -2348,7 +2348,7 @@ btn_2.addEventListener('click', function () {
     renderBanners(Wholesale_Data);
 });
 
-btn_3.addEventListener('click', async function () {
+btn_3.addEventListener('click', function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
