@@ -132,6 +132,28 @@ const DEFAULT_MY_PROFILE_INFO = {
     instagramUrl: '',
     youtubeUrl: ''
 };
+const MY_PROFILE_AUTH = (() => {
+    const auth = typeof window !== 'undefined' ? window.MY_PROFILE_AUTH : null;
+    if (!auth || typeof auth !== 'object') {
+        return { name: '', password: '' };
+    }
+
+    return {
+        name: String(auth.name || '').trim(),
+        password: String(auth.password || '')
+    };
+})();
+
+function hasReservedMyProfileName() {
+    return Boolean(MY_PROFILE_AUTH.name);
+}
+
+function matchesReservedMyProfileAuth(name, password) {
+    return hasReservedMyProfileName()
+        && Boolean(MY_PROFILE_AUTH.password)
+        && name === MY_PROFILE_AUTH.name
+        && password === MY_PROFILE_AUTH.password;
+}
 
 let firestoreDb = null;
 let firebaseStorage = null;
@@ -1859,7 +1881,7 @@ function renderMyProfile(container) {
             return;
         }
 
-        if (inputName === MY_PROFILE_AUTH.name && inputPassword === MY_PROFILE_AUTH.password) {
+        if (matchesReservedMyProfileAuth(inputName, inputPassword)) {
             useFirestoreProfile = Boolean(firestoreDb);
             activeProfileId = inputName;
             activeProfilePassword = inputPassword;
@@ -1951,7 +1973,7 @@ function renderMyProfile(container) {
             return;
         }
 
-        if (inputName === MY_PROFILE_AUTH.name) {
+        if (hasReservedMyProfileName() && inputName === MY_PROFILE_AUTH.name) {
             showStatus('That name is reserved.');
             return;
         }
@@ -2348,7 +2370,7 @@ btn_2.addEventListener('click', function () {
     renderBanners(Wholesale_Data);
 });
 
-btn_3.addEventListener('click', function () {
+btn_3.addEventListener('click', async function () {
     profileHubController = null;
     clearProfileHubHash();
     linksDiv.innerHTML = '';
